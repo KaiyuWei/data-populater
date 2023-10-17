@@ -22,10 +22,11 @@ class JsonDataImport implements ShouldQueue
 
     /**
      * Create a new job instance.
+     * @param array array of json objects
      */
-    public function __construct()
+    public function __construct(array $data)
     {
-        //
+        
     }
 
     /**
@@ -33,6 +34,6 @@ class JsonDataImport implements ShouldQueue
      */
     public function handle(): void
     {
-        //
+        
     }
 }
