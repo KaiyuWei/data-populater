@@ -17,7 +17,8 @@ class DataImporter {
             // decode the raw data
             $jsonObject = json_decode($raw);
             
-            // @todo: dispatch the job
+            // dispatch the job to the taskqueue
+            
         }
    
         // close the file
