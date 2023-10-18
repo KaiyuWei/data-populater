@@ -63,19 +63,19 @@ class JsonDataImportJob implements ShouldQueue
         foreach ($data as $row) {
             // preprocess the boolean value. 
             $row['checked'] = $row['checked'] ? 1 : 0;
-            
-            // preprocess any null values
-            $row = array_map(fn($value) => is_null($value) ? 'NULL' : $value, $row);
-
-            // preprocess the json values
-            $row['credit_card'] = json_encode($row['credit_card']);
 
             // preprocess the datatime values
             // the format 'dd/mm/yyyy' cannot be recognised by SQL datetime datatype
-            if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateTime = $row['date_of_birth'])) {
+            if (!is_null($dateTime = $row['date_of_birth']) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateTime)) {
                 // convert it to sql datetime format
                 $row['date_of_birth'] = \DateTime::createFromFormat('d/m/Y', $dateTime)->format('Y-m-d H:i:s');
             }
+
+            // preprocess the json values
+            if ($card = $row['credit_card'])  $row['credit_card'] = json_encode($card);
+            
+            // preprocess any null values
+            $row = array_map(fn($value) => is_null($value) ? null : $value, $row);
 
             // append the modified data to the result
             $result[] = $row;

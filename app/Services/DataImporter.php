@@ -30,12 +30,9 @@ class DataImporter {
             // read the fille chunk by chunk
             foreach ($source as $chunk) {
                 // for test purpose
-                if ($count < 5) {
+                if ($count < 1000) {
                     // the $chunk is an stdClass instance. convert it to an associated array
                     $chunkArray = get_object_vars($chunk);
-
-                    // convert the credit card info to an json string
-                    $chunkArray['credit_card'] = json_encode($chunkArray['credit_card']);
 
                     // add the chunck into the batch
                     $batch[] = $chunkArray;
@@ -61,24 +58,5 @@ class DataImporter {
             var_dump($e->getMessage());
             return false;
         }        
-    }
-
-    public static function readLargeFile() {
-        $path = '/Users/kaiyuwei/Downloads/challenge_1610.json';
-        $clients = Items::fromFile($path);
-
-        $count = 0;
-        $paper = [];
-
-        foreach ($clients as $client) {
-            if ($count < 3) {
-                // $paper[] = get_object_vars($client);
-                $client->credit_card = json_encode($client->credit_card);
-                $paper[] = $client;
-                $count++;
-            }
-            else break;
-        }
-        return $paper[0];
     }
 }
