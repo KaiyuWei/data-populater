@@ -20,23 +20,28 @@ class JsonDataImportJob implements ShouldQueue
      * @var int
      */
     public $tries = 3;
+    /**
+     * the data to be write into the database
+     * @var array
+     */
+    protected $dataArray;
 
     /**
      * Create a new job instance.
      * @param array array of json objects
      */
-    public function __construct(array $data)
+    public function __construct(array $dataArray)
     {
-        
+        $this->dataArray = $dataArray;
     }
 
     /**
      * Execute the job.
      */
-    public function handle($dataArr): void
+    public function handle(): void
     {
         // loop over the array. Each item of the array is one row to insert
-        foreach ($dataArr as $row) {
+        foreach ($this->dataArray as $row) {
             // store the credit card information as json string
             $row['credit_card'] = json_encode($row['credit_card']);
             
@@ -49,9 +54,8 @@ class JsonDataImportJob implements ShouldQueue
             // the keys and values as a string
             $keys = implode(", ", array_keys($row));
             
-
             // insert one row to the database
-            DB::insert('insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', array_values($row));
+            DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
         }
     }
 }
