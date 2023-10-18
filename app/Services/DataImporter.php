@@ -22,7 +22,7 @@ class DataImporter {
         $batchCount = 0;
 
         // the file datastream
-        $source = Items::fromFile($path);
+        $source = Items::fromFile($path, ['debug' =>true]);
 
         try {
             // the batch array
@@ -30,6 +30,7 @@ class DataImporter {
 
             // read the fille chunk by chunk
             foreach ($source as $chunk) {
+
                 // the $chunk is an stdClass instance. convert it to an associated array
                 $chunkArray = get_object_vars($chunk);
 

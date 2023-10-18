@@ -67,6 +67,7 @@ class JsonDataImportJob implements ShouldQueue
             // preprocess the datatime values
             // the format 'dd/mm/yyyy' cannot be recognised by SQL datetime datatype
             if (!is_null($dateTime = $row['date_of_birth']) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateTime)) {
+                
                 // convert it to sql datetime format
                 $row['date_of_birth'] = \DateTime::createFromFormat('d/m/Y', $dateTime)->format('Y-m-d H:i:s');
             }
