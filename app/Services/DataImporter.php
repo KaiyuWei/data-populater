@@ -10,6 +10,7 @@ class DataImporter {
      * batch size
      */
     const BATCH_SIZE = 5;
+
     /**
      * Read data from a .json file and populate these data to a database.
      * 
@@ -23,33 +24,31 @@ class DataImporter {
         // the file datastream
         $source = Items::fromFile($path);
 
-        // for test
-        $count = 0;
-
         try {
+            // the batch array
+            $batch =[];
+
             // read the fille chunk by chunk
             foreach ($source as $chunk) {
-                // for test purpose
-                if ($count < 1000) {
-                    // the $chunk is an stdClass instance. convert it to an associated array
-                    $chunkArray = get_object_vars($chunk);
+                // the $chunk is an stdClass instance. convert it to an associated array
+                $chunkArray = get_object_vars($chunk);
 
-                    // add the chunck into the batch
-                    $batch[] = $chunkArray;
+                // add the chunck into the batch
+                $batch[] = $chunkArray;
 
-                    // if the number of chunks reach the class batch size, dispatch a job.
-                    if (count($batch) == self::BATCH_SIZE) {
-                        // dispatch the job to the taskqueue
-                        JsonDataImportJob::dispatch($batch);
+                // if the number of chunks reach the class batch size, dispatch a job.
+                if (count($batch) == self::BATCH_SIZE) {
 
-                        // reset the batch array
-                        $batch = [];
-                    }
+                    // dispatch the job to the taskqueue
+                    JsonDataImportJob::dispatch($batch);
 
-                    $count++;
+                    // reset the batch array
+                    $batch = [];
                 }
-                else break;
             }
+
+            // for now we may still have chunks in the batch that are less then the batch size
+            JsonDataImportJob::dispatch($batch);
 
             // indicating the success
             return true;
