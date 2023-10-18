@@ -28,11 +28,12 @@ class JsonDataImportJob implements ShouldQueue
 
     /**
      * Create a new job instance.
-     * @param array array of json objects
+     * @param array array of key-value pairs
      */
     public function __construct(array $dataArray)
     {
-        $this->dataArray = $dataArray;
+        // preprocess the data before store it in the class
+        $this->dataArray = $this->preprocess($dataArray);
     }
 
     /**
@@ -42,14 +43,6 @@ class JsonDataImportJob implements ShouldQueue
     {
         // loop over the array. Each item of the array is one row to insert
         foreach ($this->dataArray as $row) {
-            // store the credit card information as json string
-            $row['credit_card'] = json_encode($row['credit_card']);
-            
-            // preprocess the boolean value. 
-            $row['checked'] = $row['checked'] ? 1 : 0;
-            
-            // preprocess any null values
-            $row = array_map(fn($value) => is_null($value) ? 'NULL' : $value, $row);
 
             // the keys and values as a string
             $keys = implode(", ", array_keys($row));
@@ -57,5 +50,36 @@ class JsonDataImportJob implements ShouldQueue
             // insert one row to the database
             DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
         }
+    }
+
+    /**
+     * preprocess data to make the values follow SQL data format
+     * @param array array of key-value pairs
+     * @return array the processed data
+     */
+    private function preprocess(array $data) {
+        $result = [];
+        // loop over the array. Each item of the array is one row to insert
+        foreach ($data as $row) {
+            // preprocess the boolean value. 
+            $row['checked'] = $row['checked'] ? 1 : 0;
+            
+            // preprocess any null values
+            $row = array_map(fn($value) => is_null($value) ? 'NULL' : $value, $row);
+
+            // preprocess the json values
+            $row['credit_card'] = json_encode($row['credit_card']);
+
+            // preprocess the datatime values
+            // the format 'dd/mm/yyyy' cannot be recognised by SQL datetime datatype
+            if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateTime = $row['date_of_birth'])) {
+                // convert it to sql datetime format
+                $row['date_of_birth'] = \DateTime::createFromFormat('d/m/Y', $dateTime)->format('Y-m-d H:i:s');
+            }
+
+            // append the modified data to the result
+            $result[] = $row;
+        }
+        return $result;
     }
 }
