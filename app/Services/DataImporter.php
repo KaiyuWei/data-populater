@@ -18,10 +18,13 @@ class DataImporter {
      * @return bool true if the import is successful, false otherwise
      */
     public static function importJSON (string $path) {
-        //@todo: hash the file and check if it was processed before 
-        // if not start from the beginning. Otherwise resume the import from where it was terminated
+        // hash value of the file
         $filehash = hash_file('sha256', $path);
-        // @todo compare this hash value with existing ones in the table "external files". if not exists, srite this file to the table.
+
+        //@todo: hash the file and check if it was processed before 
+        $failedProcess = self::fileFailedBefore($filehash);
+
+        // if not start from the beginning. Otherwise resume the import from where it was terminated
 
         // write the file in the database
         DB::insert("insert into external_files (filehash) values ('{$filehash}')");
@@ -90,6 +93,22 @@ class DataImporter {
             var_dump($e->getMessage());
             return false;
         }        
+    }
+
+    /**
+     * look up the hash value of a file in the external_files database to check if a same file
+     * failed in importing before.
+     * @param string the hash value of the file to be found
+     * @return bool true if the same file was processed and failed before, so exists in the database
+     */
+    public static function fileFailedBefore($filehash) {
+        // look for a file by its hash value
+        $result = DB::table('external_files')->select('id')->where('filehash', '=', $filehash)->get();
+
+        // if the result is null, the file has never been processed and failed before
+        if (is_null($result->first())) return false;
+
+        return true;
     }
 
     /**

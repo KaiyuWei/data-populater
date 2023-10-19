@@ -90,4 +90,12 @@ class DataImportJobTest extends TestCase
             'file_id' => $fileId,
         ]);
     }
+
+    /**
+     * test the 'DataImporter::fileFailedBefore()' function
+     */
+    public function test_file_failed_before_function(): void{
+        $this->assertTrue(DataImporter::fileFailedBefore('8a13978dc55ad8554547db4bf3be995ce7431da94fd59eed101aca7477bd6795'));
+        $this->assertFalse(DataImporter::fileFailedBefore('112233ddjjs'));
+    }
 }

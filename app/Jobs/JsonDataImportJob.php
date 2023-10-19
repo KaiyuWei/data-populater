@@ -92,7 +92,6 @@ class JsonDataImportJob implements ShouldQueue
             throw new \Exception("Job terminated accidentally");
         }
     }
-        
 
     /**
      * preprocess data to make the values follow SQL data format
@@ -124,13 +123,5 @@ class JsonDataImportJob implements ShouldQueue
             $result[] = $row;
         }
         return $result;
-    }
-
-    /**
-     * Handle a job failure.
-     */
-    public function failed(\Exception $exception): void
-    {
-        //
     }
 }
