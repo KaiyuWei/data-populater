@@ -49,7 +49,6 @@ class JsonDataImportJob implements ShouldQueue
      */
     public function __construct(array $dataArray, array $chunkBytes, int $start)
     {
-        var_dump($start);
         // preprocess the data before store it in the class
         $this->dataArray = $this->preprocess($dataArray);
 
