@@ -41,8 +41,19 @@ class JsonDataImportJob implements ShouldQueue
      */
     public function handle(): void
     {
+        // for testing
+        $count = 1;
+
         // loop over the array. Each item of the array is one row to insert
         foreach ($this->dataArray as $row) {
+
+            $count++;
+
+            if ($count == 3) 
+            {
+                $this->fail(new \Exception("job failed!"));
+                return;
+            }
 
             // the keys and values as a string
             $keys = implode(", ", array_keys($row));
@@ -82,5 +93,13 @@ class JsonDataImportJob implements ShouldQueue
             $result[] = $row;
         }
         return $result;
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Exception $exception): void
+    {
+        var_dump($exception->getMessage());
     }
 }

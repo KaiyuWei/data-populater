@@ -25,4 +25,20 @@ class DataImportJobTest extends TestCase
             "name" => "Dandre Bode PhD"
         ]);
     }
+
+    /**
+     * test if the event can be triggered
+     */
+    public function test_job_fail_event(): void
+    {
+        // the json file we use for testing
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+
+        DataImporter::importJSON($filePath);
+
+        // data should be there.
+        $this->assertDatabaseHas("clients", [
+            "name" => "Prof. Simeon Green"
+        ]);
+    }
 }
