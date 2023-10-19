@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use App\Services\DataImporter\ProgressTracker;
 
 class JsonDataImportJob implements ShouldQueue
 {
@@ -35,13 +36,23 @@ class JsonDataImportJob implements ShouldQueue
     protected $dataArray;
 
     /**
+     * the job progress tracker for this job
+     * @var ProgressTracker
+     */
+    private $tracker;
+
+    /**
      * Create a new job instance.
      * @param array array of key-value pairs
+     * @param array array of bytes of chunks this job will process
      */
-    public function __construct(array $dataArray)
+    public function __construct(array $dataArray, array $chunkBytes)
     {
         // preprocess the data before store it in the class
         $this->dataArray = $this->preprocess($dataArray);
+
+        // the progress tracker for this job
+        $this->tracker = new ProgressTracker($chunkBytes, $this);
     }
 
     /**
@@ -49,6 +60,9 @@ class JsonDataImportJob implements ShouldQueue
      */
     public function handle(): void
     {
+        // prepare the tracker
+        $this->tracker->rewind();
+
         // loop over the array. Each item of the array is one row to insert
         foreach ($this->dataArray as $row) {
 
@@ -57,6 +71,9 @@ class JsonDataImportJob implements ShouldQueue
             
             // insert one row to the database
             DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
+
+            // one chunk has been processed, move the pointer to the next chunk.
+            $this->tracker->next();
         }
     }
 

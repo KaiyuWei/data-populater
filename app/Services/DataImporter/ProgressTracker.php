@@ -48,6 +48,13 @@ class ProgressTracker implements \Iterator {
     public function key() {
       return $this->pointer;
     }
+
+    /**
+     * access a chunck size in the chunkBytes array
+     */
+    public function chunkSize(int $index) {
+        return $this->chunkBytes[$index];
+    }
   
     public function next(): void {
       $this->pointer++;

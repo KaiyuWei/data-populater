@@ -41,4 +41,17 @@ class DataImportJobTest extends TestCase
             "name" => "Prof. Simeon Green"
         ]);
     }
+
+    public function test_job_tracker(): void
+    {
+        // the json file we use for testing
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+
+        DataImporter::importJSON($filePath);
+
+        // data should be there.
+        $this->assertDatabaseHas("clients", [
+            "name" => "Prof. Simeon Green"
+        ]);
+    }
 }

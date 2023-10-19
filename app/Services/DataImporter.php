@@ -18,6 +18,11 @@ class DataImporter {
      * @return bool true if the import is successful, false otherwise
      */
     public static function importJSON (string $path) {
+        //@todo: hash the file and check if it was processed before 
+        // if not start from the beginning. Otherwise resume the import from where it was terminated
+        $filepath = hash_file('sha256', $path);
+        // @todo compare this hash value with existing ones in the table "external files". if not exists, srite this file to the table.
+
         // the count of processed numbers
         $batchCount = 0;
 
@@ -28,13 +33,16 @@ class DataImporter {
             // the batch array
             $batch =[];
 
-            // the bytes for which the file has been read
-            $bytesRead = 0;
+            // the bytes of each chunk
+            $chunkBytes = [];
 
             // read the fille chunk by chunk
             foreach ($source as $chunk) {
-                // so many bytes has been read from the file
-                $bytesRead = $source->getPosition();
+                // current position of the bytes pointer
+                $current = $source->getPosition();
+
+                // add the size of the current chunk
+                $chunkBytes[] = $source->getPosition() - array_sum($chunkBytes);
 
                 // the $chunk is an stdClass instance. convert it to an associated array
                 $chunkArray = get_object_vars($chunk);
@@ -46,7 +54,7 @@ class DataImporter {
                 if (count($batch) == self::BATCH_SIZE) {
 
                     // dispatch the job to the taskqueue
-                    JsonDataImportJob::dispatch($batch);
+                    JsonDataImportJob::dispatch($batch, $chunkBytes);
 
                     // reset the batch array
                     $batch = [];
@@ -54,8 +62,9 @@ class DataImporter {
             }
 
             // for now we may still have chunks in the batch that are less then the batch size
-            if(!empty($batch)) JsonDataImportJob::dispatch($batch);
+            if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes);
 
+            //@todo: remove the file from the external_fiiles table since it has been imported.
             // indicating the success
             return true;
         }
