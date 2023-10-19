@@ -49,7 +49,7 @@ class DataImporter {
             }
 
             // for now we may still have chunks in the batch that are less then the batch size
-            JsonDataImportJob::dispatch($batch);
+            if(!empty($batch)) JsonDataImportJob::dispatch($batch);
 
             // indicating the success
             return true;
