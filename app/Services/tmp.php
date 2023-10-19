@@ -2,7 +2,10 @@
 
 $filepath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-$hash = hash_file('sha256', $filepath);
+$source = fopen($filepath,"r");
 
-var_dump($hash);
-var_dump(strlen($hash));
+fseek($source, 4271);
+
+$raw = fread($source, 2000);
+
+var_dump($raw);

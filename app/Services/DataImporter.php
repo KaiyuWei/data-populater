@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Jobs\JsonDataImportJob;
+use App\Jobs\RemoveJsonDebrisJob;
 use Illuminate\Support\Facades\DB;
 use JsonMachine\Items;
 
@@ -21,19 +22,27 @@ class DataImporter {
         // hash value of the file
         $filehash = hash_file('sha256', $path);
 
-        //@todo: hash the file and check if it was processed before 
-        $failedProcess = self::fileFailedBefore($filehash);
-
-        // if not start from the beginning. Otherwise resume the import from where it was terminated
-
-        // write the file in the database
-        DB::insert("insert into external_files (filehash) values ('{$filehash}')");
+        // check if it was processed and failed before
+        $notNewFile = self::fileFailedBefore($filehash);
 
         // get the self-incrementing file id in the database
         $fileId = (self::fileId($filehash))[0]->id;
 
-        // the count of processed numbers
-        $batchCount = 0;
+        // the byte after which the JsonDataImportJob should start
+        $startFrom = -1;
+
+        // if not a new file, we need to process the debris that are not populated to the database
+        if ($notNewFile) {
+            // get the point after which the JsonDataImprtJob should start from
+            $startFrom = self::getStartPoint($fileId);
+
+            // dispatch a job to handle the debris left before
+            RemoveJsonDebrisJob::dispatch($path, $fileId);
+        }
+        else {
+            // write the file in the database if it is new
+            DB::insert("insert into external_files (filehash) values ('{$filehash}')");
+        }
 
         // the file datastream
         $source = Items::fromFile($path, ['debug' =>true]);
@@ -54,6 +63,9 @@ class DataImporter {
             foreach ($source as $chunk) {
                 // current position of the bytes pointer
                 $current = $source->getPosition();
+
+                // skip the processed bytes and debris
+                if ($current <= $startFrom) continue;
 
                 // add the size of the current chunk
                 $chunkBytes[] = $source->getPosition() - $batchStart - array_sum($chunkBytes);
@@ -83,7 +95,7 @@ class DataImporter {
             // for now we may still have chunks in the batch that are less then the batch size
             if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
 
-            //remove the file from the external_fiiles table when it is successfully imported
+            // remove the file from the external_fiiles table when it is successfully imported
             DB::delete("delete from external_files where filehash = '{$filehash}'");
 
             // indicating the success
@@ -109,6 +121,25 @@ class DataImporter {
         if (is_null($result->first())) return false;
 
         return true;
+    }
+
+
+    /**
+     * get the bytes after which JsonDataImportJob should start for a file that has left debris before
+     * @param int the file id
+     */
+    public static function getStartPoint($fileId) {
+        // query result order by start_point desc, so the last debris the file made ranks the first
+        $result = DB::table('chunk_debris')
+                    ->select('start_point', 'chunk_size')
+                    ->where('file_id', '=', $fileId)
+                    ->orderBy('start_point', 'desc')->get();
+        
+        // the last debris
+        $lastDebris = $result->first();
+
+        // the bytes from which the JsonDataImportJob should starts from
+        return $lastDebris->start_point + $lastDebris->chunk_size;
     }
 
     /**

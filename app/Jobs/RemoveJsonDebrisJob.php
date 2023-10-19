@@ -55,10 +55,10 @@ class RemoveJsonDebrisJob implements ShouldQueue
 
             foreach ($debrisBag as $debris)
             {
-                // move the pointer to the start of the chunk
+                // move the pointer to the start of the chunk. '+1' for skipping the ',' between adjacent chunks
                 fseek($source, $debris->start_point + 1);
 
-                // read data from the file. 
+                // read data from the file. 'chunk_size-1' for we have skipped the ',' between two adjacent chunks.
                 $raw = fread($source, $debris->chunk_size - 1);
 
                 // convert the raw data to an associated array, and modify the data format

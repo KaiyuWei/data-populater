@@ -65,11 +65,6 @@ class JsonDataImportJob implements ShouldQueue
                     
                     // the keys as a string
                     $keys = implode(", ", array_keys($row));
-                    
-                    // ################# for test #################
-                    if ($row['name'] == "Kamille Gusikowski") {
-                        throw new \Exception("job terminated");
-                    }
 
                     // insert one row to the database
                     DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
