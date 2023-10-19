@@ -36,13 +36,18 @@ class DataImporter {
             // the bytes of each chunk
             $chunkBytes = [];
 
+            // start processing from 0 bytes
+            $current = 0;
+            // initialize the pointer for the position from last iteration
+            $last = 0;
+
             // read the fille chunk by chunk
             foreach ($source as $chunk) {
                 // current position of the bytes pointer
                 $current = $source->getPosition();
 
                 // add the size of the current chunk
-                $chunkBytes[] = $source->getPosition() - array_sum($chunkBytes);
+                $chunkBytes[] = $source->getPosition() - $last - array_sum($chunkBytes);
 
                 // the $chunk is an stdClass instance. convert it to an associated array
                 $chunkArray = get_object_vars($chunk);
@@ -52,17 +57,22 @@ class DataImporter {
 
                 // if the number of chunks reach the class batch size, dispatch a job.
                 if (count($batch) == self::BATCH_SIZE) {
-
                     // dispatch the job to the taskqueue
-                    JsonDataImportJob::dispatch($batch, $chunkBytes);
+                    JsonDataImportJob::dispatch($batch, $chunkBytes, $last);
 
-                    // reset the batch array
+                    // the end point of the current batch, which is where the next batch starts.
+                    $last = $current;
+
+                    // rewind the chunkBytes array for the next batch
+                    $chunkBytes = [];
+                    
+                    // rewind the batch array
                     $batch = [];
                 }
             }
 
             // for now we may still have chunks in the batch that are less then the batch size
-            if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes);
+            if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $last);
 
             //@todo: remove the file from the external_fiiles table since it has been imported.
             // indicating the success

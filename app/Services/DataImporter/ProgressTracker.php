@@ -14,6 +14,12 @@ class ProgressTracker implements \Iterator {
     private $job;
 
     /**
+     * the point in the file where the job starts
+     * @var int
+     */
+    private $start;
+
+    /**
      * Bytes of chunks to be processed by the job bind to this tracker
      * @var array
      */
@@ -28,11 +34,15 @@ class ProgressTracker implements \Iterator {
      * Constructor
      * @param array the bytes of chunks in the job
      */
-    public function __construct(array $chunkBytes, JsonDataImportJob $job) {
-      // array_values() makes sure that the keys are numbers
-      $this->chunkBytes = $chunkBytes;
-      // the job this tracker tracks
-      $this->job = $job;
+    public function __construct(array $chunkBytes, JsonDataImportJob $job, int $start) {
+        // array_values() makes sure that the keys are numbers
+        $this->chunkBytes = $chunkBytes;
+        
+        // the job this tracker tracks
+        $this->job = $job;
+        
+        // the start point of the job
+        $this->start = $start;
     }
 
     /**

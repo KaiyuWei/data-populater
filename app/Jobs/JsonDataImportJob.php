@@ -45,14 +45,16 @@ class JsonDataImportJob implements ShouldQueue
      * Create a new job instance.
      * @param array array of key-value pairs
      * @param array array of bytes of chunks this job will process
+     * @param int the point in the file where this job starts processing
      */
-    public function __construct(array $dataArray, array $chunkBytes)
+    public function __construct(array $dataArray, array $chunkBytes, int $start)
     {
+        var_dump($start);
         // preprocess the data before store it in the class
         $this->dataArray = $this->preprocess($dataArray);
 
         // the progress tracker for this job
-        $this->tracker = new ProgressTracker($chunkBytes, $this);
+        $this->tracker = new ProgressTracker($chunkBytes, $this, $start);
     }
 
     /**
