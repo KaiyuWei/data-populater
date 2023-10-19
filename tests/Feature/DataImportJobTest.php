@@ -126,7 +126,7 @@ class DataImportJobTest extends TestCase
      * | 37 |      29 |        3409 |        861 | NULL       | NULL       |
      * +----+---------+-------------+------------+------------+------------+
      * 
-     * 3. and delete from client.
+     * 3. delete from client.
      */
     public function test_data_importer_import_json_function_for_an_debris_file(): void
     {
