@@ -61,4 +61,19 @@ class DataImportJobTest extends TestCase
 
         $this->assertEquals(6, $result[0]->id);
     }
+
+    public function test_job_write_chunk_debris(): void
+    {
+        // the json file we use for testing
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+
+        DataImporter::importJSON($filePath);
+        
+        $this->assertDatabaseHas('clients', [
+            "name" => "Dandre Bode PhD",
+        ]);
+        $this->assertDatabaseMissing("clients", [
+            "name" => "Kamille Gusikowski",
+        ]);
+    }
 }

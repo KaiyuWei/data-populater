@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('external_files', function (Blueprint $table) {
             $table->id();
             // the hash value of a file
-            $table->string('filehash')->unique();
+            $table->string('filehash')->unique(); 
             $table->timestamps();
         });
     }

@@ -81,4 +81,24 @@ class ProgressTracker implements \Iterator {
       // count() indicates how many items are in the list
       return $this->pointer < count($this->chunkBytes);
     }
+
+    /**
+     * expose the chunkBytes array
+     */
+    public function chunks() {
+        return $this->chunkBytes;
+    }
+
+    /**
+     * The bytes that have been processed
+     * @return int the processed bytes in this chunk
+     */
+    public function processedBytes() {
+        $processedBytes = 0;
+        // loop over the chunkBytes array from the beginning until the current one (excluded)
+        for ($i = 0; $i < $this->key(); $i++) {
+            $processedBytes += $this->chunkBytes[$i];
+        }
+        return $processedBytes;
+    }
   }

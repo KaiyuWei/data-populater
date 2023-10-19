@@ -26,6 +26,9 @@ class DataImporter {
         // write the file in the database
         DB::insert("insert into external_files (filehash) values ('{$filehash}')");
 
+        // get the self-incrementing file id in the database
+        $fileId = (self::fileId($filehash))[0]->id;
+
         // the count of processed numbers
         $batchCount = 0;
 
@@ -61,7 +64,7 @@ class DataImporter {
                 // if the number of chunks reach the class batch size, dispatch a job.
                 if (count($batch) == self::BATCH_SIZE) {
                     // dispatch the job to the taskqueue
-                    JsonDataImportJob::dispatch($batch, $chunkBytes, $batchStart);
+                    JsonDataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
 
                     // the end point of the current batch, which is where the next batch starts.
                     $batchStart = $current;
@@ -75,10 +78,10 @@ class DataImporter {
             }
 
             // for now we may still have chunks in the batch that are less then the batch size
-            if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $batchStart);
+            if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
 
             //remove the file from the external_fiiles table when it is successfully imported
-            // DB::delete("delete from external_files where filehash = '{$filehash}'");
+            DB::delete("delete from external_files where filehash = '{$filehash}'");
 
             // indicating the success
             return true;
