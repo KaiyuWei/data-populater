@@ -1,7 +1,8 @@
 <?php
 
-if (function_exists('pcntl_signal')) {
-    echo 'pcntl is enabled.';
-} else {
-    echo 'pcntl is not enabled.';
-}
+$filepath = "/Users/kaiyuwei/Downloads/shorter.json";
+
+$hash = hash_file('sha256', $filepath);
+
+var_dump($hash);
+var_dump(strlen($hash));

@@ -28,9 +28,11 @@ class ProgressTracker implements \Iterator {
      * Constructor
      * @param array the bytes of chunks in the job
      */
-    public function __construct($chunkBytes) {
+    public function __construct(array $chunkBytes, JsonDataImportJob $job) {
       // array_values() makes sure that the keys are numbers
       $this->chunkBytes = $chunkBytes;
+      // the job this tracker tracks
+      $this->job = $job;
     }
 
     /**
