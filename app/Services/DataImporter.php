@@ -28,8 +28,13 @@ class DataImporter {
             // the batch array
             $batch =[];
 
+            // the bytes for which the file has been read
+            $bytesRead = 0;
+
             // read the fille chunk by chunk
             foreach ($source as $chunk) {
+                // so many bytes has been read from the file
+                $bytesRead = $source->getPosition();
 
                 // the $chunk is an stdClass instance. convert it to an associated array
                 $chunkArray = get_object_vars($chunk);

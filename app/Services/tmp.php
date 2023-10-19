@@ -1,16 +1,7 @@
 <?php
-namespace App\Services;
-use JsonMachine\Items;
 
-$path = '/Users/kaiyuwei/Downloads/shorterJson.json';
-$clients = Items::fromFile('fruits.json');
-
-$count = 0;
-
-foreach ($clients as $client) {
-    if ($count < 2) {
-        var_dump($client);
-        $count++;
-    }
-    else break;
+if (function_exists('pcntl_signal')) {
+    echo 'pcntl is enabled.';
+} else {
+    echo 'pcntl is not enabled.';
 }

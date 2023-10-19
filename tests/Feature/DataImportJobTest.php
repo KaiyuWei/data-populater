@@ -22,7 +22,7 @@ class DataImportJobTest extends TestCase
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
-            "name" => "Dandre Bode PhD"
+            "name" => "Prof. Simeon Green"
         ]);
     }
 

@@ -19,7 +19,15 @@ class JsonDataImportJob implements ShouldQueue
      *
      * @var int
      */
-    public $tries = 3;
+    public $tries = 0;
+
+    /**
+     * The number of seconds the job can run before timing out.
+     * 
+     * @var int
+     */
+    public $timeout = 1;
+
     /**
      * the data to be write into the database
      * @var array
@@ -41,19 +49,8 @@ class JsonDataImportJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // for testing
-        $count = 1;
-
         // loop over the array. Each item of the array is one row to insert
         foreach ($this->dataArray as $row) {
-
-            $count++;
-
-            if ($count == 3) 
-            {
-                $this->fail(new \Exception("job failed!"));
-                return;
-            }
 
             // the keys and values as a string
             $keys = implode(", ", array_keys($row));
@@ -100,6 +97,6 @@ class JsonDataImportJob implements ShouldQueue
      */
     public function failed(\Exception $exception): void
     {
-        var_dump($exception->getMessage());
+        //
     }
 }
