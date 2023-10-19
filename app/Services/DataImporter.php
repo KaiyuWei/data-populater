@@ -78,8 +78,8 @@ class DataImporter {
             if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $batchStart);
 
             //remove the file from the external_fiiles table when it is successfully imported
-            DB::delete("delete from external_files where filehash = '{$filehash}'");
-            
+            // DB::delete("delete from external_files where filehash = '{$filehash}'");
+
             // indicating the success
             return true;
         }
@@ -87,5 +87,13 @@ class DataImporter {
             var_dump($e->getMessage());
             return false;
         }        
+    }
+
+    /**
+     * expose the file id by the file hash value
+     * @var string the hash value of the file
+     */
+    public static function fileId($hashvalue) {
+        return DB::select("select id from external_files where filehash = '{$hashvalue}'");
     }
 }

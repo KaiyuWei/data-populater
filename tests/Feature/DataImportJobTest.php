@@ -54,4 +54,11 @@ class DataImportJobTest extends TestCase
             "name" => "Prof. Simeon Green"
         ]);
     }
+
+    public function test_job_importer_fileId_function ():void 
+    {
+        $result = DataImporter::fileId('8a13978dc55ad8554547db4bf3be995ce7431da94fd59eed101aca7477bd6795');
+
+        $this->assertEquals(6, $result[0]->id);
+    }
 }
