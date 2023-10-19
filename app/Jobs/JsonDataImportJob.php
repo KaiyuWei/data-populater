@@ -16,20 +16,6 @@ class JsonDataImportJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public $tries = 0;
-
-    /**
-     * The number of seconds the job can run before timing out.
-     * 
-     * @var int
-     */
-    public $timeout = 1;
-
-    /**
      * The id of the file this job works for
      * @var int
      */
@@ -77,10 +63,10 @@ class JsonDataImportJob implements ShouldQueue
                 // loop over the array. Each item of the array is one row to insert
                 foreach ($this->dataArray as $row) {
                     
-                    // the keys and values as a string
+                    // the keys as a string
                     $keys = implode(", ", array_keys($row));
                     
-                    //for test
+                    // ################# for test #################
                     if ($row['name'] == "Kamille Gusikowski") {
                         throw new \Exception("job terminated");
                     }

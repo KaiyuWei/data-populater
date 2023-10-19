@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Services\DataImporter;
+use App\Jobs\RemoveJsonDebrisJob;
 
 class DataImportJobTest extends TestCase
 {
@@ -74,6 +75,19 @@ class DataImportJobTest extends TestCase
         ]);
         $this->assertDatabaseMissing("clients", [
             "name" => "Kamille Gusikowski",
+        ]);
+    }
+
+    public function test_remove_json_debris_job (): void
+    {
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+
+        $fileId = 26;
+
+        RemoveJsonDebrisJob::dispatch($filePath, $fileId);
+
+        $this->assertDatabaseMissing("chunk_debris", [
+            'file_id' => $fileId,
         ]);
     }
 }
