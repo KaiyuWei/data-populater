@@ -31,30 +31,30 @@ class DataImporter {
         // the byte after which the JsonDataImportJob should start
         $startFrom = -1;
 
-        // if not a new file, we need to process the debris that are not populated to the database
-        if ($notNewFile) {
-
-            // get the self-incrementing file id in the database
-            $fileId = (self::fileId($filehash))[0]->id;
-
-            // get the point after which the JsonDataImprtJob should start from
-            $startFrom = self::getStartPoint($fileId);
-
-            // dispatch a job to handle the debris left before
-            RemoveJsonDebrisJob::dispatch($path, $fileId);
-        }
-        else {
-            // write the file in the database if it is new
-            DB::insert("insert into external_files (filehash) values ('{$filehash}')");
-
-            // get the self-incrementing file id in the database
-            $fileId = (self::fileId($filehash))[0]->id;
-        }
-
-        // the file datastream
-        $source = Items::fromFile($path, ['debug' =>true]);
-
         try {
+            // if not a new file, we need to process the debris that are not populated to the database
+            if ($notNewFile) {
+
+                // get the self-incrementing file id in the database
+                $fileId = (self::fileId($filehash))[0]->id;
+
+                // get the point after which the JsonDataImprtJob should start from
+                $startFrom = self::getStartPoint($fileId);
+
+                // dispatch a job to handle the debris left before
+                RemoveJsonDebrisJob::dispatch($path, $fileId);
+            }
+            else {
+                // write the file in the database if it is new
+                DB::insert("insert into external_files (filehash) values ('{$filehash}')");
+
+                // get the self-incrementing file id in the database
+                $fileId = (self::fileId($filehash))[0]->id;
+            }
+
+            // the file datastream
+            $source = Items::fromFile($path, ['debug' =>true]);
+
             // the batch array
             $batch =[];
 
@@ -102,8 +102,8 @@ class DataImporter {
             // for now we may still have chunks in the batch that are less then the batch size
             if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
 
-            // remove the file from the external_fiiles table when it is successfully imported
-            DB::delete("delete from external_files where filehash = '{$filehash}'");
+            // remove the file from the external_fiiles table when no debris of it left
+            if (!self::fileDebrisExist($fileId)) DB::delete("delete from external_files where filehash = '{$filehash}'");
 
             // indicating the success
             return true;
