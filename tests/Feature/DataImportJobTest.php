@@ -97,6 +97,11 @@ class DataImportJobTest extends TestCase
         ]);
     }
 
+    public function test_file_debris_exists(): void{
+        $this->assertTrue(DataImporter::fileDebrisExist(31));
+        $this->assertFalse(DataImporter::fileDebrisExist(27));
+    }
+
     /**
      * test the 'DataImporter::fileFailedBefore()' function
      */

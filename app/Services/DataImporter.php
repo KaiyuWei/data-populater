@@ -156,4 +156,18 @@ class DataImporter {
     public static function fileId($hashvalue) {
         return DB::select("select id from external_files where filehash = '{$hashvalue}'");
     }
+
+    /**
+     * check if there's any debris to be processed for a file
+     * @var int file ID
+     * @return bool true if there is debris for the file
+     */
+    public static function fileDebrisExist($fileId)
+    {
+        // make query and check if the result is null
+        $result = DB::table('chunk_debris')->select('id')->where('file_id', '=', $fileId)->get();
+
+        // if something returned from the query, return true. Otherwise return false.
+        return !is_null($result->first());
+    }
 }
