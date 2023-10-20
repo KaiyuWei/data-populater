@@ -23,6 +23,10 @@ class DataImportJobTest extends TestCase
 
         DataImporter::importJSON($filePath);
 
+        // check the total number of rows 
+        // there are 6 clients in this file
+        $this->assertEquals(6, Client::count());
+
         // data should be there.
         $this->assertDatabaseHas("clients", [
             "name" => "Prof. Simeon Green"

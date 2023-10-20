@@ -26,13 +26,17 @@ class DataImporter {
         $notNewFile = self::fileFailedBefore($filehash);
 
         // get the self-incrementing file id in the database
-        $fileId = (self::fileId($filehash))[0]->id;
+        $fileId = 0;
 
         // the byte after which the JsonDataImportJob should start
         $startFrom = -1;
 
         // if not a new file, we need to process the debris that are not populated to the database
         if ($notNewFile) {
+
+            // get the self-incrementing file id in the database
+            $fileId = (self::fileId($filehash))[0]->id;
+
             // get the point after which the JsonDataImprtJob should start from
             $startFrom = self::getStartPoint($fileId);
 
@@ -42,6 +46,9 @@ class DataImporter {
         else {
             // write the file in the database if it is new
             DB::insert("insert into external_files (filehash) values ('{$filehash}')");
+
+            // get the self-incrementing file id in the database
+            $fileId = (self::fileId($filehash))[0]->id;
         }
 
         // the file datastream
