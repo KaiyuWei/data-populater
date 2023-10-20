@@ -14,7 +14,8 @@ class ProgressTracker implements \Iterator {
     private $job;
 
     /**
-     * the point in the file where the job starts
+     * the point in the file where the job starts 
+     * it is an absolute position index of the area that this job and tracker processes
      * @var int
      */
     private $start;
@@ -90,15 +91,18 @@ class ProgressTracker implements \Iterator {
     }
 
     /**
-     * The bytes that have been processed
+     * The position of the current chunk in the whole file
      * @return int the processed bytes in this chunk
      */
-    public function processedBytes() {
+    public function bytesAhead() {
+        // the bytes that have been processed in the batch
         $processedBytes = 0;
         // loop over the chunkBytes array from the beginning until the current one (excluded)
         for ($i = 0; $i < $this->key(); $i++) {
             $processedBytes += $this->chunkBytes[$i];
         }
-        return $processedBytes;
+
+        // the position of this chunk in the file + the bytes that have been processed in this batch.
+        return $this->start + $processedBytes;
     }
   }

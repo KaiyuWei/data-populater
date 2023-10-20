@@ -4,8 +4,8 @@ $filepath = "/Users/kaiyuwei/Downloads/shorter.json";
 
 $source = fopen($filepath,"r");
 
-fseek($source, 4271);
+fseek($source, 4272);
 
-$raw = fread($source, 2000);
+$raw = fread($source, 944);
 
 var_dump($raw);

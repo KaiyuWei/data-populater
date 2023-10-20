@@ -66,6 +66,9 @@ class JsonDataImportJob implements ShouldQueue
                     // the keys as a string
                     $keys = implode(", ", array_keys($row));
 
+        // ######### for test #########
+        if ($row['name'] == "Ms. Una Lynch MD") throw new \Exception('Job terminated!');
+
                     // insert one row to the database
                     DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
                 
@@ -78,8 +81,9 @@ class JsonDataImportJob implements ShouldQueue
 
             // create debris for the chunks that has not been successfully added in the database
             while ($tracker->valid()) {
+
                 // write this chunk debris into the database
-                DB::insert('insert into chunk_debris (file_id, start_point, chunk_size) values (?, ?, ?)', [$this->fileId, $tracker->processedBytes(), $tracker->current()]);
+                DB::insert('insert into chunk_debris (file_id, start_point, chunk_size) values (?, ?, ?)', [$this->fileId, $tracker->bytesAhead(), $tracker->current()]);
                 $tracker->next();
             }
 

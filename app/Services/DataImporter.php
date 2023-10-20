@@ -63,6 +63,7 @@ class DataImporter {
 
             // start processing from 0 bytes
             $current = 0;
+            
             // initialize the pointer for the position from last iteration
             $batchStart = 0;
 

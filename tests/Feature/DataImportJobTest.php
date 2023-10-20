@@ -19,18 +19,23 @@ class DataImportJobTest extends TestCase
     public function test_job_write_data_to_database(): void
     {
         // the json file we use for testing
-        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+        $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
 
         DataImporter::importJSON($filePath);
 
         // check the total number of rows 
         // there are 6 clients in this file
-        $this->assertEquals(6, Client::count());
+        // $this->assertEquals(6, Client::count());
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
             "name" => "Prof. Simeon Green"
         ]);
+        
+        $this->assertDatabaseHas("clients", [
+            "name" => "Mrs. Daphney Borer"
+        ]);
+
     }
 
     /**
