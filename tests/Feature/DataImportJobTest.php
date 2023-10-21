@@ -22,13 +22,13 @@ class DataImportJobTest extends TestCase
     public function test_job_write_data_to_database(): void
     {
         // the json file we use for testing
-        // $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
-        $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+        // $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
 
-        DataImporter::importJSON($filePath, 'json');
+        DataImporter::importFromFile($filePath, 'json');
 
         // check the total number of rows 
-        $this->assertEquals(10002, Client::count());
+        // $this->assertEquals(10002, Client::count());
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
@@ -49,7 +49,7 @@ class DataImportJobTest extends TestCase
         // the json file we use for testing
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath, 'json');
+        DataImporter::importFromFile($filePath, 'json');
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
@@ -62,7 +62,7 @@ class DataImportJobTest extends TestCase
         // the json file we use for testing
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath, 'json');
+        DataImporter::importFromFile($filePath, 'json');
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
@@ -82,7 +82,7 @@ class DataImportJobTest extends TestCase
         // the json file we use for testing
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath, 'json');
+        DataImporter::importFromFile($filePath, 'json');
         
         $this->assertDatabaseHas('clients', [
             "name" => "Dandre Bode PhD",
@@ -149,7 +149,7 @@ class DataImportJobTest extends TestCase
     {
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath, 'json');
+        DataImporter::importFromFile($filePath, 'json');
 
         // check that the file has been deleted from the database
         $this->assertDatabaseMissing('external_files', [

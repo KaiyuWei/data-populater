@@ -15,13 +15,13 @@ class DataImporter {
     const BATCH_SIZE = 5;
 
     /**
-     * Read data from a .json file and populate these data to a database.
+     * Read data from a file and populate these data to a database.
      * 
      * @param string path to the file
      * @param string the file format type, 'json', 'xml' or 'csv'
      * @return bool true if the import is successful, false otherwise
      */
-    public static function importJSON (string $path, $fileType) {
+    public static function importFromFile (string $path, $fileType) {
         // hash value of the file
         $filehash = hash_file('sha256', $path);
 
