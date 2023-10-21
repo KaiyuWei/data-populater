@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Services\DataImporter;
-use App\Jobs\RemoveJsonDebrisJob;
+use App\Jobs\RemoveFileDebrisJob;
 use App\Models\ChunkDebris;
 use App\Models\ExternalFile;
 use App\Models\Client;
@@ -101,7 +101,7 @@ class DataImportJobTest extends TestCase
 
         $fileId = 26;
 
-        RemoveJsonDebrisJob::dispatch($filePath, $fileId);
+        RemoveFileDebrisJob::dispatch($filePath, $fileId);
 
         $this->assertDatabaseMissing("chunk_debris", [
             'file_id' => $fileId,

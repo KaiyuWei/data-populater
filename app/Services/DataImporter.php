@@ -4,7 +4,7 @@ namespace App\Services;
 use App\Jobs\DataImportJob;
 use App\Jobs\CsvDataImportJob;
 use App\Services\DataImporter\ChunkGenerator;
-use App\Jobs\RemoveJsonDebrisJob;
+use App\Jobs\RemoveFileDebrisJob;
 use Illuminate\Support\Facades\DB;
 use JsonMachine\Items;
 
@@ -45,7 +45,7 @@ class DataImporter {
                 $startFrom = self::getStartPoint($fileId);
 
                 // dispatch a job to handle the debris left before
-                RemoveJsonDebrisJob::dispatch($path, $fileId);
+                RemoveFileDebrisJob::dispatch($path, $fileId);
             }
             else {
                 // write the file in the database if it is new
