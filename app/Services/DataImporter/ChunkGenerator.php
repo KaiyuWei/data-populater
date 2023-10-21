@@ -49,11 +49,13 @@ class ChunkGenerator {
     }
 
     /**
-     * the generator for json files
+     * generate chunks from json files
      */
     private function jsonChunks() {
         $source = Items::fromFile($this->file, ['debug' =>true]);
         foreach ($source as $chunk) {
+            // preprocess data in the chunk
+            $chunk = $this->preprocess($chunk);
             // update the pointer position and yield a chunk
             $this->position = $source->getPosition();
             yield $chunk;
@@ -61,11 +63,20 @@ class ChunkGenerator {
     }
 
     private function csvChunks() {
+        // to be completed for csv files
         yield 1;
     }
 
     private function xmlChunks() {
+        // to be completed for xml files
         yield 1;
+    }
+
+    /**
+     * the fileter that determines which data should or should not be processed
+     */
+    private function dataFilter($chunk) {
+        return true;
     }
 
     /**
@@ -73,5 +84,32 @@ class ChunkGenerator {
      */
     public function getPosition() {
         return $this->position;
+    }
+
+    /**
+     * preprocess data so the data format follow the sql data standard
+     * @param \stdClass the chunk to be pre-processed
+     */
+    private function preprocess($chunk){
+        // preprocess the boolean value. 
+        $chunk->checked = $chunk->checked ? 1 : 0;
+
+        // preprocess the datatime values
+        // the format 'dd/mm/yyyy' cannot be recognised by SQL datetime datatype
+        if (!is_null($dateTime = $chunk->date_of_birth) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateTime)) {
+            
+            // convert it to sql datetime format
+            $chunk->date_of_birth = \DateTime::createFromFormat('d/m/Y', $dateTime)->format('Y-m-d H:i:s');
+        }
+
+        // preprocess the json values
+        if ($card = $chunk->credit_card)  $chunk->credit_card = json_encode($card);
+        
+        // preprocess any null values
+        foreach ($chunk as $key => $value) {
+            if (is_null($value)) $chunk->$key = null;
+        }
+
+        return $chunk;
     }
 }

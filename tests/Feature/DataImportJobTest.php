@@ -225,5 +225,17 @@ class DataImportJobTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function test_date_time_format()
+    {
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+        $source = new ChunkGenerator($filePath, 'json');
+
+        foreach($source->chunks() as $chunk) {
+            var_dump(gettype($chunk->date_of_birth));
+        }
+
+        $this->assertTrue(true);
+    }
 }
 
