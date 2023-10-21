@@ -9,6 +9,8 @@ use App\Services\DataImporter;
 use App\Jobs\RemoveJsonDebrisJob;
 use App\Models\ChunkDebris;
 use App\Models\Client;
+use JsonMachine\Items;
+use Illuminate\Support\Str;
 
 class DataImportJobTest extends TestCase
 {
@@ -174,4 +176,37 @@ class DataImportJobTest extends TestCase
             "name" => "Dr. Testi Tostington",
         ]);
     }
+
+    /**
+     * generate the csv file for test
+     */
+    public function test_create_csv_file() {
+        $source = fopen('/Users/kaiyuwei/Downloads/csv_data.csv', 'r+');
+
+        fputcsv($source, ['name', 'address', 'checked', 'description', 'interest', 'date_of_birth', 'email', 'account', 'credit_card']);
+
+        for ($i = 0; $i < 1000; $i++) {
+            $row = [
+                $name = fake()->name(),
+                preg_replace('/[\r\n]+/', ' ', fake()->address()),
+                'false',
+                fake()->text(150),
+                fake()->text(50),
+                fake()->dateTime()->format('Y-m-d H:i:s'),
+                fake()->email(),
+                Str::random(8),
+                json_encode([
+                    "type" => "Visa",
+                    "number" => "4929182424412",
+                    "name" => $name,
+                    "expirationDate" => "02/20"
+                ])
+            ];
+            fputcsv($source, $row);
+        }
+        fclose($source);
+
+        $this->assertTrue(true);
+    }
 }
+
