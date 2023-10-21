@@ -11,10 +11,6 @@ class DataImportJobFilter {
      */
     private const FILTERS = ['age'];
 
-    public function __construct() {
-        //
-    }
-
     /**
      * the array of bool values indicates of the corresponding row should be processed
      * @param array the data to be processed with this filter
@@ -56,7 +52,6 @@ class DataImportJobFilter {
 
         // parse the dateof birth info to an array
         $dateOfBirth = date_parse($dateOfBirth);
-
         if ($dateOfBirth !== false) {
             // Create a DateTime object for the date of birth
             $birthDate = new \DateTime();

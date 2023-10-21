@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use App\Services\DataImporter;
 use App\Services\DataImporter\ProgressTracker;
+use App\Jobs\DataImportJobFilter\DataImportJobFilter;
 
 class DataImportJob implements ShouldQueue
 {
@@ -51,7 +52,7 @@ class DataImportJob implements ShouldQueue
     {
         $this->dataArray = $dataArray;
         // bool values determining if a row should be written into the database
-        $this->dataFilterArray = array_fill(0, DataImporter::BATCH_SIZE, true);
+        $this->dataFilterArray = array_fill(0, count($dataArray), true);
         $this->fileId = $fileId;
         // the progress tracker for this job
         $this->tracker = new ProgressTracker($chunkBytes, $this, $start);
@@ -62,22 +63,29 @@ class DataImportJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // @todo generate the datafileter
+        // generate the datafileter for this class
+        $filterConfig = [
+            'age' => [30, 200, true]
+        ];
+        $this->dataFilterArray = (new DataImportJobFilter())->generateFilterArray($this->dataArray, $filterConfig);
 
         // prepare the tracker
         // $this->tracker->rewind();
         try{
                 // loop over the array. Each item of the array is one row to insert
-                foreach ($this->dataArray as $row) {
-        // ######### for test #########
-        // if ($row['name'] == "Ms. Una Lynch MD") throw new \Exception('Job terminated!');
+                //foreach ($this->dataArray as $row) {
+                for ($i = 0; $i < count($this->dataArray); $i++) {
+                    $row = $this->dataArray[$i];
 
-                    // insert one row to the database
-                    // @todo: use the filter array
+                    // ######### for test #########
+                    // if ($row['name'] == "Ms. Una Lynch MD") throw new \Exception('Job terminated!');
 
-                    // the keys as a string
-                    $keys = implode(", ", array_keys($row));
-                    DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
+                    // insert one row to the database if the filter allows
+                    if ($this->dataFilterArray[$i]) {
+                        // the keys as a string
+                        $keys = implode(", ", array_keys($row));
+                        DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
+                    }
 
                     // one chunk has been processed, move the pointer to the next chunk.
                     $this->tracker->next();
