@@ -1,7 +1,7 @@
 <?php
 namespace App\Services;
 
-use App\Jobs\JsonDataImportJob;
+use App\Jobs\DataImportJob;
 use App\Jobs\CsvDataImportJob;
 use App\Services\DataImporter\ChunkGenerator;
 use App\Jobs\RemoveJsonDebrisJob;
@@ -31,7 +31,7 @@ class DataImporter {
         // get the self-incrementing file id in the database
         $fileId = 0;
 
-        // the byte after which the JsonDataImportJob should start
+        // the byte after which the DataImportJob should start
         $startFrom = -1;
 
         try {
@@ -90,7 +90,7 @@ class DataImporter {
                 // if the number of chunks reach the class batch size, dispatch a job.
                 if (count($batch) == self::BATCH_SIZE) {
                     // dispatch the job to the taskqueue
-                    JsonDataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
+                    DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
 
                     // the end point of the current batch, which is where the next batch starts.
                     $batchStart = $current;
@@ -104,7 +104,7 @@ class DataImporter {
             }
 
             // for now we may still have chunks in the batch that are less then the batch size
-            if(!empty($batch)) JsonDataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
+            if(!empty($batch)) DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
 
             // remove the file from the external_fiiles table when no debris of it left
             if (!self::fileDebrisExist($fileId)) DB::delete("delete from external_files where filehash = '{$filehash}'");
@@ -136,7 +136,7 @@ class DataImporter {
 
 
     /**
-     * get the bytes after which JsonDataImportJob should start for a file that has left debris before
+     * get the bytes after which DataImportJob should start for a file that has left debris before
      * @param int the file id
      */
     public static function getStartPoint($fileId) {
@@ -149,7 +149,7 @@ class DataImporter {
         // the last debris
         $lastDebris = $result->first();
 
-        // the bytes from which the JsonDataImportJob should starts from
+        // the bytes from which the DataImportJob should starts from
         return $lastDebris->start_point + $lastDebris->chunk_size;
     }
 

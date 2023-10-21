@@ -8,6 +8,7 @@ use Tests\TestCase;
 use App\Services\DataImporter;
 use App\Jobs\RemoveJsonDebrisJob;
 use App\Models\ChunkDebris;
+use App\Models\ExternalFile;
 use App\Models\Client;
 use JsonMachine\Items;
 use Illuminate\Support\Str;
@@ -17,18 +18,20 @@ class DataImportJobTest extends TestCase
 {
 
     /**
-     * test if data is written into the database by JsonDataImportJob
+     * test if data is written into the database by DataImportJob
      */
     public function test_job_write_data_to_database(): void
     {
         // the json file we use for testing
-        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
-        // $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
+        // $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+        $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
 
         DataImporter::importFromFile($filePath, 'json');
 
         // check the total number of rows 
-        // $this->assertEquals(10002, Client::count());
+        $this->assertEquals(10002, Client::count());
+        $this->assertEquals(0, ChunkDebris::count());
+        $this->assertEquals(0, ExternalFile::count());
 
         // data should be there.
         $this->assertDatabaseHas("clients", [

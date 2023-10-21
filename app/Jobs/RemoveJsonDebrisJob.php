@@ -1,6 +1,6 @@
 <?php
 /**
- * this job imports data that have failed in being imported by JsonDataIMportJob.
+ * this job imports data that have failed in being imported by DataImportJob.
  */
 
 namespace App\Jobs;

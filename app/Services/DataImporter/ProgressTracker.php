@@ -4,12 +4,12 @@
  */
 namespace App\Services\DataImporter;
 
-use App\Jobs\JsonDataImportJob;
+use App\Jobs\DataImportJob;
 
 class ProgressTracker implements \Iterator {
     /**
      * the job this tracker tracks
-     * @var JsonDataImportJob
+     * @var DataImportJob
      */
     private $job;
 
@@ -35,7 +35,7 @@ class ProgressTracker implements \Iterator {
      * Constructor
      * @param array the bytes of chunks in the job
      */
-    public function __construct(array $chunkBytes, JsonDataImportJob $job, int $start) {
+    public function __construct(array $chunkBytes, DataImportJob $job, int $start) {
         // array_values() makes sure that the keys are numbers
         $this->chunkBytes = $chunkBytes;
         
