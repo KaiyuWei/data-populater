@@ -13,6 +13,7 @@ use App\Models\Client;
 use JsonMachine\Items;
 use Illuminate\Support\Str;
 use App\Services\DataImporter\ChunkGenerator;
+use App\Jobs\DataImportJobFilter\DataImportJobFilter;
 
 class DataImportJobTest extends TestCase
 {
@@ -236,6 +237,24 @@ class DataImportJobTest extends TestCase
         }
 
         $this->assertTrue(true);
+    }
+
+    public function test_data_import_job_filter(): void
+    {
+        $filter = new DataImportJobFilter();
+
+        $testString = [
+            ['date_of_birth' => '2002-12-01'],
+            ['date_of_birth' => '2015-12-01 10:00:00'],
+            ['date_of_birth' => '1990-12-01'],
+            ['date_of_birth' => '1987-12-01'],
+            ['date_of_birth' => null],
+            ['date_of_birth' => '2013-12-01'],
+        ];
+
+        $result = $filter->generateFilterArray($testString, ['age' => [20, 40, true]]);
+
+        $this->assertEquals($result, [true, false, true, true, true, false]);
     }
 }
 

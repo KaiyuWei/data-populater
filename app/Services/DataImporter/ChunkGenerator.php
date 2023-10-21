@@ -14,7 +14,7 @@ class ChunkGenerator {
     private $file;
 
     /**
-     * the format of the file
+     * the type format of the file, json, csv or xml
      * @var string
      */
     private $format;
@@ -56,8 +56,10 @@ class ChunkGenerator {
         foreach ($source as $chunk) {
             // preprocess data in the chunk
             $chunk = $this->preprocess($chunk);
+
             // update the pointer position and yield a chunk
             $this->position = $source->getPosition();
+
             yield $chunk;
         }
     }
@@ -70,13 +72,6 @@ class ChunkGenerator {
     private function xmlChunks() {
         // to be completed for xml files
         yield 1;
-    }
-
-    /**
-     * the fileter that determines which data should or should not be processed
-     */
-    private function dataFilter($chunk) {
-        return true;
     }
 
     /**
@@ -97,7 +92,6 @@ class ChunkGenerator {
         // preprocess the datatime values
         // the format 'dd/mm/yyyy' cannot be recognised by SQL datetime datatype
         if (!is_null($dateTime = $chunk->date_of_birth) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dateTime)) {
-            
             // convert it to sql datetime format
             $chunk->date_of_birth = \DateTime::createFromFormat('d/m/Y', $dateTime)->format('Y-m-d H:i:s');
         }
