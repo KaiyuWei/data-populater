@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Jobs\JsonDataImportJob;
 use App\Jobs\CsvDataImportJob;
+use App\Services\DataImporter\ChunkGenerator;
 use App\Jobs\RemoveJsonDebrisJob;
 use Illuminate\Support\Facades\DB;
 use JsonMachine\Items;
@@ -17,9 +18,10 @@ class DataImporter {
      * Read data from a .json file and populate these data to a database.
      * 
      * @param string path to the file
+     * @param string the file format type, 'json', 'xml' or 'csv'
      * @return bool true if the import is successful, false otherwise
      */
-    public static function importJSON (string $path) {
+    public static function importJSON (string $path, $fileType) {
         // hash value of the file
         $filehash = hash_file('sha256', $path);
 
@@ -54,7 +56,7 @@ class DataImporter {
             }
 
             // the file datastream
-            $source = Items::fromFile($path, ['debug' =>true]);
+            $source = new ChunkGenerator($path, $fileType);
 
             // the batch array
             $batch =[];
@@ -69,7 +71,7 @@ class DataImporter {
             $batchStart = 0;
 
             // read the fille chunk by chunk
-            foreach ($source as $chunk) {
+            foreach ($source->chunks() as $chunk) {
                 // current position of the bytes pointer
                 $current = $source->getPosition();
 

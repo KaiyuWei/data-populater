@@ -11,6 +11,7 @@ use App\Models\ChunkDebris;
 use App\Models\Client;
 use JsonMachine\Items;
 use Illuminate\Support\Str;
+use App\Services\DataImporter\ChunkGenerator;
 
 class DataImportJobTest extends TestCase
 {
@@ -21,13 +22,13 @@ class DataImportJobTest extends TestCase
     public function test_job_write_data_to_database(): void
     {
         // the json file we use for testing
+        // $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
         $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
 
-        DataImporter::importJSON($filePath);
+        DataImporter::importJSON($filePath, 'json');
 
         // check the total number of rows 
-        // there are 6 clients in this file
-        // $this->assertEquals(6, Client::count());
+        $this->assertEquals(10002, Client::count());
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
@@ -35,7 +36,7 @@ class DataImportJobTest extends TestCase
         ]);
         
         $this->assertDatabaseHas("clients", [
-            "name" => "Mrs. Daphney Borer"
+            "name" => "Adriel Roob"
         ]);
 
     }
@@ -48,7 +49,7 @@ class DataImportJobTest extends TestCase
         // the json file we use for testing
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath);
+        DataImporter::importJSON($filePath, 'json');
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
@@ -61,7 +62,7 @@ class DataImportJobTest extends TestCase
         // the json file we use for testing
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath);
+        DataImporter::importJSON($filePath, 'json');
 
         // data should be there.
         $this->assertDatabaseHas("clients", [
@@ -81,7 +82,7 @@ class DataImportJobTest extends TestCase
         // the json file we use for testing
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath);
+        DataImporter::importJSON($filePath, 'json');
         
         $this->assertDatabaseHas('clients', [
             "name" => "Dandre Bode PhD",
@@ -148,7 +149,7 @@ class DataImportJobTest extends TestCase
     {
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
 
-        DataImporter::importJSON($filePath);
+        DataImporter::importJSON($filePath, 'json');
 
         // check that the file has been deleted from the database
         $this->assertDatabaseMissing('external_files', [
@@ -205,6 +206,19 @@ class DataImportJobTest extends TestCase
             fputcsv($source, $row);
         }
         fclose($source);
+
+        $this->assertTrue(true);
+    }
+
+    public function test_chunk_generator()
+    {
+        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
+        $source = new ChunkGenerator($filePath, 'json');
+
+        foreach($source->chunks() as $chunk) {
+            var_dump($chunk);
+            var_dump($source->getPosition());
+        }
 
         $this->assertTrue(true);
     }
