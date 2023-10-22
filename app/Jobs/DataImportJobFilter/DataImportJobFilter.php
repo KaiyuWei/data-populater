@@ -9,7 +9,7 @@ class DataImportJobFilter {
      * array of filter function names
      * @var array<string>
      */
-    private const FILTERS = ['age'];
+    private const FILTERS = ['age', 'creditCard'];
 
     /**
      * the array of bool values indicates of the corresponding row should be processed
@@ -65,5 +65,13 @@ class DataImportJobFilter {
             return $age >= $min && $age <= $max;
         }
         else throw new \Exception('the date of birth string is in an unrecognisable format');
+    }
+
+    /**
+     * the filter for credit card number
+     */
+    public function creditCard($row) {
+        // to be completed
+        return true;
     }
 }
