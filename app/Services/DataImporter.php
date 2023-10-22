@@ -19,9 +19,10 @@ class DataImporter {
      * 
      * @param string path to the file
      * @param string the file format type, 'json', 'xml' or 'csv'
+     * @param array the config for filters. e.g. ['age' => [30, 200, true]]
      * @return bool true if the import is successful, false otherwise
      */
-    public static function importFromFile (string $path, $fileType) {
+    public static function importFromFile (string $path, $fileType, $filterConfig = []) {
         // hash value of the file
         $filehash = hash_file('sha256', $path);
 

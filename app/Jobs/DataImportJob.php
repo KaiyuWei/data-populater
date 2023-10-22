@@ -50,6 +50,7 @@ class DataImportJob implements ShouldQueue
      */
     public function __construct(array $dataArray, array $chunkBytes, int $fileId, int $start)
     {
+        var_dump($chunkBytes);
         $this->dataArray = $dataArray;
         // bool values determining if a row should be written into the database
         $this->dataFilterArray = array_fill(0, count($dataArray), true);
@@ -69,16 +70,17 @@ class DataImportJob implements ShouldQueue
         ];
         $this->dataFilterArray = (new DataImportJobFilter())->generateFilterArray($this->dataArray, $filterConfig);
 
+        var_dump($this->dataFilterArray);
+
         // prepare the tracker
         // $this->tracker->rewind();
         try{
                 // loop over the array. Each item of the array is one row to insert
-                //foreach ($this->dataArray as $row) {
                 for ($i = 0; $i < count($this->dataArray); $i++) {
                     $row = $this->dataArray[$i];
 
                     // ######### for test #########
-                    // if ($row['name'] == "Ms. Una Lynch MD") throw new \Exception('Job terminated!');
+                    if ($row['name'] == "Kamille Gusikowski") throw new \Exception('Job terminated!');
 
                     // insert one row to the database if the filter allows
                     if ($this->dataFilterArray[$i]) {
@@ -96,10 +98,11 @@ class DataImportJob implements ShouldQueue
 
             // create debris for the chunks that has not been successfully added in the database
             while ($tracker->valid()) {
-                // @todo only keep debris allowed by the filter
-
-                // write this chunk debris into the database
-                DB::insert('insert into chunk_debris (file_id, start_point, chunk_size) values (?, ?, ?)', [$this->fileId, $tracker->bytesAhead(), $tracker->current()]);
+                // apply filter to only write the rows allowed by the filter in debris table
+                if ($this->dataFilterArray[$tracker->key()]) {
+                    // write this chunk debris into the database
+                    DB::insert('insert into chunk_debris (file_id, start_point, chunk_size) values (?, ?, ?)', [$this->fileId, $tracker->bytesAhead(), $tracker->current()]);
+                }
                 $tracker->next();
             }
 
