@@ -19,7 +19,7 @@ class DataImporter {
      * 
      * @param string path to the file
      * @param string the file format type, 'json', 'xml' or 'csv'
-     * @param array the config for filters. e.g. ['age' => [30, 200, true]]
+     * @param array the config for filters including filter name and arguments. e.g. ['age' => [30, 200, true]]
      * @return bool true if the import is successful, false otherwise
      */
     public static function importFromFile (string $path, $fileType, $filterConfig = []) {
@@ -91,7 +91,7 @@ class DataImporter {
                 // if the number of chunks reach the class batch size, dispatch a job.
                 if (count($batch) == self::BATCH_SIZE) {
                     // dispatch the job to the taskqueue
-                    DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
+                    DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart, $filterConfig);
 
                     // the end point of the current batch, which is where the next batch starts.
                     $batchStart = $current;
@@ -105,7 +105,7 @@ class DataImporter {
             }
 
             // for now we may still have chunks in the batch that are less then the batch size
-            if(!empty($batch)) DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart);
+            if(!empty($batch)) DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart, $filterConfig);
 
             // remove the file from the external_fiiles table when no debris of it left
             if (!self::fileDebrisExist($fileId)) DB::delete("delete from external_files where filehash = '{$filehash}'");

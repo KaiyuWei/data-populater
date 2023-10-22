@@ -42,21 +42,27 @@ class DataImportJob implements ShouldQueue
     private $dataFilterArray;
 
     /**
+     * @var array the config for datafilter
+     */
+    private $filterConfig;
+
+    /**
      * Create a new job instance.
      * @param array array of key-value pairs
      * @param array array of bytes of chunks this job will process
      * @param int the id of the file this job works for
      * @param int the point in the file where this job starts processing
+     * @param array data filter configuarition
      */
-    public function __construct(array $dataArray, array $chunkBytes, int $fileId, int $start)
+    public function __construct(array $dataArray, array $chunkBytes, int $fileId, int $start, array $filterConfig)
     {
-        var_dump($chunkBytes);
         $this->dataArray = $dataArray;
         // bool values determining if a row should be written into the database
         $this->dataFilterArray = array_fill(0, count($dataArray), true);
         $this->fileId = $fileId;
         // the progress tracker for this job
         $this->tracker = new ProgressTracker($chunkBytes, $this, $start);
+        $this->filterConfig = $filterConfig;
     }
 
     /**
@@ -65,12 +71,7 @@ class DataImportJob implements ShouldQueue
     public function handle(): void
     {
         // generate the datafileter for this class
-        $filterConfig = [
-            'age' => [30, 200, true]
-        ];
-        $this->dataFilterArray = (new DataImportJobFilter())->generateFilterArray($this->dataArray, $filterConfig);
-
-        var_dump($this->dataFilterArray);
+        $this->dataFilterArray = (new DataImportJobFilter())->generateFilterArray($this->dataArray, $this->filterConfig);
 
         // prepare the tracker
         // $this->tracker->rewind();
@@ -80,7 +81,7 @@ class DataImportJob implements ShouldQueue
                     $row = $this->dataArray[$i];
 
                     // ######### for test #########
-                    if ($row['name'] == "Kamille Gusikowski") throw new \Exception('Job terminated!');
+                    // if ($row['name'] == "Kamille Gusikowski") throw new \Exception('Job terminated!');
 
                     // insert one row to the database if the filter allows
                     if ($this->dataFilterArray[$i]) {

@@ -27,10 +27,10 @@ class DataImportJobTest extends TestCase
         $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
         // $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
 
-        DataImporter::importFromFile($filePath, 'json');
+        DataImporter::importFromFile($filePath, 'json', ['age' => [30, 200, true]]);
 
         // check the total number of rows 
-        $this->assertEquals(5, Client::count());
+        $this->assertEquals(6, Client::count());
         $this->assertDatabaseHas('clients', ['name' => 'Prof. Simeon Green']);
         $this->assertDatabaseHas('clients', ['name'=> 'Dandre Bode PhD']);
         $this->assertDatabaseHas('clients', ['name'=> "Kamille Gusikowski"]);
