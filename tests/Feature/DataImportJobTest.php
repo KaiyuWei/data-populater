@@ -24,26 +24,22 @@ class DataImportJobTest extends TestCase
     public function test_job_write_data_to_database(): void
     {
         // the json file we use for testing
-        $filePath = "/Users/kaiyuwei/Downloads/shorter.json";
-        // $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
+        $filePath = "/Users/kaiyuwei/Downloads/challenge_1610.json";
 
-        DataImporter::importFromFile($filePath, 'json', ['age' => [30, 200, true]]);
+        // call the data import function, provide the file, the format of the file and the data fileter.
 
-        // check the total number of rows 
-        $this->assertEquals(6, Client::count());
+        // Option 1. import WITHOUT data filter
+        DataImporter::importFromFile($filePath, 'json');
+        // Option 2. import WITH data filter, limiting the customer age to 18-65 years old
+        // DataImporter::importFromFile($filePath, 'json', ['age' => [18, 65, true]]);
+
+        // check the total number of rows. In total there are 10001 chunks with no datafilters
+        $this->assertEquals(10001, Client::count());
+
+        // check if all names are importerd
         $this->assertDatabaseHas('clients', ['name' => 'Prof. Simeon Green']);
-        $this->assertDatabaseHas('clients', ['name'=> 'Dandre Bode PhD']);
-        $this->assertDatabaseHas('clients', ['name'=> "Kamille Gusikowski"]);
-
-        // data should be there.
-        // $this->assertDatabaseHas("clients", [
-        //     "name" => "Prof. Simeon Green"
-        // ]);
-        
-        // $this->assertDatabaseHas("clients", [
-        //     "name" => "Adriel Roob"
-        // ]);
-
+        $this->assertDatabaseHas('clients', ['name'=> 'Polly Mertz']);
+        $this->assertDatabaseHas('clients', ['name'=> "Dr. Rosie Fritsch Sr."]);
     }
 
     /**
