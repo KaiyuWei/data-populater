@@ -40,7 +40,7 @@ class DataImporter {
             if ($notNewFile) {
 
                 // get the self-incrementing file id in the database
-                $fileId = (self::fileId($filehash))[0]->id;
+                $fileId = self::fileId($filehash);
 
                 // get the point after which the JsonDataImprtJob should start from
                 $startFrom = self::getStartPoint($fileId);
@@ -52,8 +52,8 @@ class DataImporter {
                 // write the file in the database if it is new
                 DB::table('external_files')->insert(['filehash' => $filehash]);
 
-                // get the self-incrementing file id in the database
-                $fileId = (self::fileId($filehash))[0]->id;
+                // get the self-incrementing file id that was just added in the database
+                $fileId = self::fileId($filehash);
             }
 
             // the file datastream
@@ -161,7 +161,6 @@ class DataImporter {
      * @return int|null the value of the id
      */
     public static function fileId(string $hashvalue) {
-        // return DB::select("select id from external_files where filehash = '{$hashvalue}'");
         if (is_null($result = DB::table('external_files')->where('filehash', '=', $hashvalue)->first())) return null;
         else return $result->id;
     }
