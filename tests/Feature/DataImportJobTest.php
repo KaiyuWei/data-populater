@@ -24,6 +24,7 @@ class DataImportJobTest extends TestCase
     public function test_job_write_data_to_database(): void
     {
         // the json file we use for testing
+        // $filePath = "/usr/local/bin/shorter.json";
         $filePath = "/usr/local/bin/challenge_1610.json";
 
         // call the data import function, provide the file, the format of the file and the data fileter.

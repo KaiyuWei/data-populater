@@ -50,7 +50,7 @@ class DataImporter {
             }
             else {
                 // write the file in the database if it is new
-                DB::insert("insert into external_files (filehash) values ('{$filehash}')");
+                DB::table('external_files')->insert(['filehash' => $filehash]);
 
                 // get the self-incrementing file id in the database
                 $fileId = (self::fileId($filehash))[0]->id;

@@ -87,7 +87,8 @@ class DataImportJob implements ShouldQueue
                     if ($this->dataFilterArray[$i]) {
                         // the keys as a string
                         $keys = implode(", ", array_keys($row));
-                        DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
+
+                        DB::table('clients')->insert($row);
                     }
 
                     // one chunk has been processed, move the pointer to the next chunk.
@@ -102,7 +103,11 @@ class DataImportJob implements ShouldQueue
                 // apply filter to only write the rows allowed by the filter in debris table
                 if ($this->dataFilterArray[$tracker->key()]) {
                     // write this chunk debris into the database
-                    DB::insert('insert into chunk_debris (file_id, start_point, chunk_size) values (?, ?, ?)', [$this->fileId, $tracker->bytesAhead(), $tracker->current()]);
+                    DB::table('chunk_debris')->insert([
+                        'file_id' => $this->fileId,
+                        'start_point' => $tracker->bytesAhead(),
+                        'chunk_size' => $tracker->current(),
+                    ]);
                 }
                 $tracker->next();
             }

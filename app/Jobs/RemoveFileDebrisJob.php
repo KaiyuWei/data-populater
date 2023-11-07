@@ -66,7 +66,8 @@ class RemoveFileDebrisJob implements ShouldQueue
                 $keys = implode(", ", array_keys($row));
 
                 // insert one row to the database
-                DB::insert("insert into clients ($keys) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", array_values($row));
+                DB::table('clients')->insert($row);
+
 
                 // insertion success, remove this debris from the database
                 DB::table('chunk_debris')->where('id', '=', $debris->id)->delete();
