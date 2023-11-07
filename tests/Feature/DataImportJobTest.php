@@ -74,9 +74,13 @@ class DataImportJobTest extends TestCase
 
     public function test_job_importer_fileId_function ():void 
     {
-        $result = DataImporter::fileId('8a13978dc55ad8554547db4bf3be995ce7431da94fd59eed101aca7477bd6795');
+        // the test case for existing hash value
+        $result = DataImporter::fileId('dasfnwefds');
+        $this->assertEquals(10, $result);
 
-        $this->assertEquals(6, $result[0]->id);
+        // the test case for non-existing hash value
+        $result = DataImporter::fileId('dasfnwefdsfdsafdsdafdsafawfee');
+        $this->assertEquals(null, $result);
     }
 
     public function test_job_write_chunk_debris(): void

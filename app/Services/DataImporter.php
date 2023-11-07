@@ -108,7 +108,8 @@ class DataImporter {
             if(!empty($batch)) DataImportJob::dispatch($batch, $chunkBytes, $fileId, $batchStart, $filterConfig);
 
             // remove the file from the external_fiiles table when no debris of it left
-            if (!self::fileDebrisExist($fileId)) DB::delete("delete from external_files where filehash = '{$filehash}'");
+            // if (!self::fileDebrisExist($fileId)) DB::delete("delete from external_files where filehash = '{$filehash}'");
+            if (!self::fileDebrisExist($fileId)) DB::table('external_files')->where('filehash', '=', $filehash);
 
             // indicating the success
             return true;
@@ -156,10 +157,13 @@ class DataImporter {
 
     /**
      * look up the file id by the file hash value
-     * @var string the hash value of the file
+     * @param string the hash value of the file
+     * @return int|null the value of the id
      */
-    public static function fileId($hashvalue) {
-        return DB::select("select id from external_files where filehash = '{$hashvalue}'");
+    public static function fileId(string $hashvalue) {
+        // return DB::select("select id from external_files where filehash = '{$hashvalue}'");
+        if (is_null($result = DB::table('external_files')->where('filehash', '=', $hashvalue)->first())) return null;
+        else return $result->id;
     }
 
     /**
