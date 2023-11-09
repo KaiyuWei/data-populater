@@ -81,7 +81,7 @@ class DataImportJob implements ShouldQueue
                     $row = $this->dataArray[$i];
 
                     // ######### for test #########
-                    if ($row['name'] == "Deonte Harvey") throw new \Exception('Job terminated!');
+                    // if ($row['name'] == "Deonte Harvey") throw new \Exception('Job terminated!');
 
                     // insert one row to the database if the filter allows
                     if ($this->dataFilterArray[$i]) {

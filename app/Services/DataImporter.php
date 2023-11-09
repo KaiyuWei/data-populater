@@ -109,7 +109,7 @@ class DataImporter {
 
             // remove the file from the external_fiiles table when no debris of it left
             // if (!self::fileDebrisExist($fileId)) DB::delete("delete from external_files where filehash = '{$filehash}'");
-            if (!self::fileDebrisExist($fileId)) DB::table('external_files')->where('filehash', '=', $filehash);
+            if (!self::fileDebrisExist($fileId)) DB::table('external_files')->where('filehash', '=', $filehash)->delete();
 
             // indicating the success
             return true;
